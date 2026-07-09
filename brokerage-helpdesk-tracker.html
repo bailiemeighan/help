@@ -1,0 +1,1692 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brokerage IT Ticket Tracker</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f8f9;
+      --panel: #ffffff;
+      --ink: #172026;
+      --muted: #60707c;
+      --line: #d9e2e7;
+      --line-strong: #b8c8d1;
+      --primary: #0f766e;
+      --primary-dark: #0b5f59;
+      --primary-soft: #dff3f1;
+      --blue: #2563eb;
+      --blue-soft: #e8f0ff;
+      --amber: #b45309;
+      --amber-soft: #fff4df;
+      --red: #b42318;
+      --red-soft: #ffe7e4;
+      --green: #047857;
+      --green-soft: #e4f7ec;
+      --shadow: 0 14px 36px rgba(18, 32, 44, 0.08);
+      --radius: 8px;
+      --focus: 0 0 0 3px rgba(15, 118, 110, 0.18);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+      border-color: var(--primary);
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 16px 22px;
+      display: grid;
+      grid-template-columns: minmax(240px, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 1.18rem;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-top: 4px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      min-height: 38px;
+      padding: 9px 12px;
+      border-radius: 7px;
+      background: var(--panel);
+      border: 1px solid var(--line-strong);
+      color: var(--ink);
+      font-weight: 650;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: #8aa0ad;
+      background: #f9fbfc;
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn.primary:hover {
+      background: var(--primary-dark);
+      border-color: var(--primary-dark);
+    }
+
+    .btn.danger {
+      color: var(--red);
+      border-color: #f2b8b2;
+      background: #fffafa;
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border-color: transparent;
+      color: var(--muted);
+    }
+
+    .btn.small {
+      min-height: 32px;
+      padding: 6px 9px;
+      font-size: 0.86rem;
+    }
+
+    main {
+      width: 100%;
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 20px 22px 42px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .metric-card,
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .metric-card {
+      padding: 14px;
+      min-height: 96px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 750;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      font-size: 1.72rem;
+      font-weight: 800;
+      margin-top: 8px;
+      line-height: 1;
+    }
+
+    .metric-note {
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-top: 8px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(330px, 440px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      min-width: 0;
+    }
+
+    .panel-header {
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .panel-body {
+      padding: 16px;
+    }
+
+    form {
+      display: grid;
+      gap: 13px;
+    }
+
+    .grid-2,
+    .grid-3,
+    .report-filters {
+      display: grid;
+      gap: 11px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .report-filters {
+      grid-template-columns: 1.2fr repeat(5, minmax(120px, 1fr));
+      align-items: end;
+    }
+
+    label {
+      color: var(--muted);
+      display: grid;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: #ffffff;
+      color: var(--ink);
+      padding: 9px 10px;
+      min-height: 38px;
+    }
+
+    textarea {
+      min-height: 86px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 3px;
+    }
+
+    .left-actions,
+    .right-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .ticket-tools {
+      display: grid;
+      grid-template-columns: minmax(180px, 1.2fr) repeat(4, minmax(120px, 0.8fr));
+      gap: 10px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .ticket-count {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .ticket-list {
+      display: grid;
+      gap: 0;
+    }
+
+    .ticket-row {
+      display: grid;
+      grid-template-columns: minmax(170px, 1.15fr) minmax(170px, 1fr) minmax(135px, 0.75fr) minmax(120px, 0.7fr) minmax(110px, 0.65fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .ticket-row:last-child {
+      border-bottom: 0;
+    }
+
+    .ticket-main {
+      min-width: 0;
+    }
+
+    .ticket-id {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .ticket-title {
+      font-weight: 800;
+      margin-top: 3px;
+      overflow-wrap: anywhere;
+    }
+
+    .ticket-meta {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 4px 9px;
+      min-height: 25px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      width: fit-content;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .status-new {
+      background: var(--blue-soft);
+      color: #174ea6;
+      border-color: #bfd1ff;
+    }
+
+    .status-in-progress {
+      background: var(--amber-soft);
+      color: var(--amber);
+      border-color: #f3d391;
+    }
+
+    .status-waiting {
+      background: #edf2f7;
+      color: #475569;
+      border-color: #cbd5e1;
+    }
+
+    .status-resolved,
+    .status-closed {
+      background: var(--green-soft);
+      color: var(--green);
+      border-color: #a7e8c4;
+    }
+
+    .priority-critical {
+      background: var(--red-soft);
+      color: var(--red);
+      border-color: #ffb8b2;
+    }
+
+    .priority-high {
+      background: var(--amber-soft);
+      color: var(--amber);
+      border-color: #f3d391;
+    }
+
+    .priority-normal {
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      border-color: #a4dad5;
+    }
+
+    .priority-low {
+      background: #edf2f7;
+      color: #526374;
+      border-color: #cbd5e1;
+    }
+
+    .due-overdue {
+      color: var(--red);
+      font-weight: 800;
+    }
+
+    .due-soon {
+      color: var(--amber);
+      font-weight: 800;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .empty-state {
+      padding: 34px 18px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty-state strong {
+      display: block;
+      color: var(--ink);
+      margin-bottom: 5px;
+    }
+
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .report-box {
+      min-width: 0;
+    }
+
+    .report-box h3 {
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+
+    .bar-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .bar-row {
+      display: grid;
+      gap: 5px;
+    }
+
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.83rem;
+      font-weight: 750;
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 999px;
+      background: #edf2f5;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: inherit;
+      min-width: 2px;
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .summary-table th,
+    .summary-table td {
+      padding: 8px 0;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .summary-table th {
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      background: #132126;
+      color: #ffffff;
+      padding: 11px 14px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+      z-index: 20;
+      max-width: min(420px, calc(100vw - 36px));
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    @media (max-width: 1120px) {
+      .metrics {
+        grid-template-columns: repeat(3, minmax(140px, 1fr));
+      }
+
+      .workspace,
+      .reports-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .report-filters {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 820px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+      }
+
+      .metrics,
+      .grid-2,
+      .grid-3,
+      .report-filters,
+      .ticket-tools {
+        grid-template-columns: 1fr;
+      }
+
+      .ticket-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .row-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    @media print {
+      header,
+      .ticket-tools,
+      .form-actions,
+      .row-actions,
+      #ticketFormPanel {
+        display: none !important;
+      }
+
+      body {
+        background: #ffffff;
+      }
+
+      main {
+        padding: 0;
+      }
+
+      .panel,
+      .metric-card {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="topbar">
+        <div>
+          <h1>Brokerage IT Ticket Tracker</h1>
+          <p class="subtle">Personal help desk log for real estate agent support, follow-up, and reporting.</p>
+        </div>
+        <div class="toolbar" aria-label="Global actions">
+          <button class="btn" type="button" id="exportCsvBtn">Export CSV</button>
+          <button class="btn" type="button" id="backupBtn">Backup JSON</button>
+          <button class="btn" type="button" id="importBtn">Import JSON</button>
+          <button class="btn" type="button" id="printBtn">Print Report</button>
+          <input class="file-input" type="file" id="importFile" accept="application/json,.json">
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="metrics" aria-label="Ticket metrics">
+        <div class="metric-card">
+          <span class="metric-label">Open Tickets</span>
+          <strong class="metric-value" id="openMetric">0</strong>
+          <span class="metric-note" id="openNote">Ready for the next request</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Due Today</span>
+          <strong class="metric-value" id="dueMetric">0</strong>
+          <span class="metric-note">Based on follow-up dates</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Resolved This Month</span>
+          <strong class="metric-value" id="resolvedMetric">0</strong>
+          <span class="metric-note" id="resolvedNote">Closed or resolved tickets</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Avg Resolution</span>
+          <strong class="metric-value" id="avgMetric">0h</strong>
+          <span class="metric-note">Created to resolved</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Time Logged</span>
+          <strong class="metric-value" id="timeMetric">0h</strong>
+          <span class="metric-note">Filtered ticket total</span>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <section class="panel" id="ticketFormPanel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title" id="formTitle">New Ticket</h2>
+              <p class="subtle" id="formSubtitle">Capture the support request while details are fresh.</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <form id="ticketForm">
+              <input type="hidden" id="ticketId">
+              <div class="grid-2">
+                <label>Created
+                  <input type="datetime-local" id="createdAt" required>
+                </label>
+                <label>Status
+                  <select id="status" required>
+                    <option>New</option>
+                    <option>In Progress</option>
+                    <option>Waiting</option>
+                    <option>Resolved</option>
+                    <option>Closed</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="grid-2">
+                <label>Agent Name
+                  <input type="text" id="agentName" placeholder="Agent or staff member" required>
+                </label>
+                <label>Office / Team
+                  <input type="text" id="office" placeholder="Main office, branch, team">
+                </label>
+              </div>
+
+              <div class="grid-2">
+                <label>Contact
+                  <input type="text" id="contact" placeholder="Email, phone, or extension">
+                </label>
+                <label>Channel
+                  <select id="channel">
+                    <option>Email</option>
+                    <option>Phone</option>
+                    <option>Text</option>
+                    <option>Walk-in</option>
+                    <option>Internal request</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="grid-2">
+                <label>Category
+                  <select id="category" required>
+                    <option>MLS / Listing</option>
+                    <option>Transaction Documents</option>
+                    <option>E-signature</option>
+                    <option>Email / Account</option>
+                    <option>Device / Printer</option>
+                    <option>Network / Internet</option>
+                    <option>CRM / Website</option>
+                    <option>Compliance / Forms</option>
+                    <option>Onboarding / Offboarding</option>
+                    <option>Other</option>
+                  </select>
+                </label>
+                <label>Priority
+                  <select id="priority" required>
+                    <option>Normal</option>
+                    <option>High</option>
+                    <option>Critical</option>
+                    <option>Low</option>
+                  </select>
+                </label>
+              </div>
+
+              <label>Issue Summary
+                <input type="text" id="summary" placeholder="Cannot access MLS, printer jam, email setup..." required>
+              </label>
+
+              <label>Ticket Notes
+                <textarea id="notes" placeholder="What happened, steps taken, next action, vendor notes..."></textarea>
+              </label>
+
+              <div class="grid-3">
+                <label>Property / Transaction
+                  <input type="text" id="transaction" placeholder="Address or file name">
+                </label>
+                <label>Follow-up Date
+                  <input type="date" id="followUp">
+                </label>
+                <label>Time Spent
+                  <input type="number" id="timeSpent" min="0" step="5" placeholder="Minutes">
+                </label>
+              </div>
+
+              <label>Resolution
+                <textarea id="resolution" placeholder="How it was fixed or why it was closed."></textarea>
+              </label>
+
+              <div class="form-actions">
+                <div class="left-actions">
+                  <button class="btn primary" type="submit" id="saveBtn">Save Ticket</button>
+                  <button class="btn" type="button" id="newBtn">Clear</button>
+                </div>
+                <div class="right-actions">
+                  <button class="btn" type="button" id="resolveBtn">Resolve Now</button>
+                  <button class="btn danger" type="button" id="deleteBtn">Delete</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Tickets</h2>
+              <p class="subtle" id="ticketCount">No tickets yet</p>
+            </div>
+            <button class="btn small" type="button" id="sampleBtn">Add Sample Data</button>
+          </div>
+
+          <div class="ticket-tools" aria-label="Ticket filters">
+            <label>Search
+              <input type="search" id="searchFilter" placeholder="Agent, issue, office, ticket ID">
+            </label>
+            <label>Status
+              <select id="statusFilter">
+                <option value="All">All</option>
+                <option>New</option>
+                <option>In Progress</option>
+                <option>Waiting</option>
+                <option>Resolved</option>
+                <option>Closed</option>
+              </select>
+            </label>
+            <label>Priority
+              <select id="priorityFilter">
+                <option value="All">All</option>
+                <option>Critical</option>
+                <option>High</option>
+                <option>Normal</option>
+                <option>Low</option>
+              </select>
+            </label>
+            <label>Category
+              <select id="categoryFilter">
+                <option value="All">All</option>
+              </select>
+            </label>
+            <label>Sort
+              <select id="sortOrder">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="priority">Priority first</option>
+                <option value="followup">Follow-up date</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="ticket-list" id="ticketList"></div>
+        </section>
+      </section>
+
+      <section class="panel" aria-label="Reporting">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Reporting</h2>
+            <p class="subtle">Use the filters below to create a monthly, office, or category view before exporting.</p>
+          </div>
+          <span class="ticket-count" id="reportScope">All tickets</span>
+        </div>
+        <div class="panel-body">
+          <div class="report-filters">
+            <label>Report Search
+              <input type="search" id="reportSearch" placeholder="Optional report keyword">
+            </label>
+            <label>From
+              <input type="date" id="fromDate">
+            </label>
+            <label>To
+              <input type="date" id="toDate">
+            </label>
+            <label>Office
+              <select id="officeReport">
+                <option value="All">All</option>
+              </select>
+            </label>
+            <label>Category
+              <select id="categoryReport">
+                <option value="All">All</option>
+              </select>
+            </label>
+            <label>Status
+              <select id="statusReport">
+                <option value="All">All</option>
+                <option>New</option>
+                <option>In Progress</option>
+                <option>Waiting</option>
+                <option>Resolved</option>
+                <option>Closed</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="reports-grid" style="margin-top: 18px;">
+            <div class="report-box">
+              <h3>By Category</h3>
+              <div class="bar-list" id="categoryBars"></div>
+            </div>
+            <div class="report-box">
+              <h3>By Status</h3>
+              <div class="bar-list" id="statusBars"></div>
+            </div>
+            <div class="report-box">
+              <h3>Office Summary</h3>
+              <table class="summary-table">
+                <thead>
+                  <tr>
+                    <th>Office</th>
+                    <th>Tickets</th>
+                    <th>Minutes</th>
+                  </tr>
+                </thead>
+                <tbody id="officeSummary"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const storageKey = "brokerageHelpdeskTickets.v1";
+    const categories = [
+      "MLS / Listing",
+      "Transaction Documents",
+      "E-signature",
+      "Email / Account",
+      "Device / Printer",
+      "Network / Internet",
+      "CRM / Website",
+      "Compliance / Forms",
+      "Onboarding / Offboarding",
+      "Other"
+    ];
+    const priorityWeight = { Critical: 1, High: 2, Normal: 3, Low: 4 };
+    const openStatuses = ["New", "In Progress", "Waiting"];
+    const closedStatuses = ["Resolved", "Closed"];
+
+    let tickets = loadTickets();
+
+    const el = {
+      ticketForm: document.getElementById("ticketForm"),
+      ticketId: document.getElementById("ticketId"),
+      createdAt: document.getElementById("createdAt"),
+      status: document.getElementById("status"),
+      agentName: document.getElementById("agentName"),
+      office: document.getElementById("office"),
+      contact: document.getElementById("contact"),
+      channel: document.getElementById("channel"),
+      category: document.getElementById("category"),
+      priority: document.getElementById("priority"),
+      summary: document.getElementById("summary"),
+      notes: document.getElementById("notes"),
+      transaction: document.getElementById("transaction"),
+      followUp: document.getElementById("followUp"),
+      timeSpent: document.getElementById("timeSpent"),
+      resolution: document.getElementById("resolution"),
+      formTitle: document.getElementById("formTitle"),
+      formSubtitle: document.getElementById("formSubtitle"),
+      saveBtn: document.getElementById("saveBtn"),
+      newBtn: document.getElementById("newBtn"),
+      resolveBtn: document.getElementById("resolveBtn"),
+      deleteBtn: document.getElementById("deleteBtn"),
+      sampleBtn: document.getElementById("sampleBtn"),
+      ticketList: document.getElementById("ticketList"),
+      ticketCount: document.getElementById("ticketCount"),
+      searchFilter: document.getElementById("searchFilter"),
+      statusFilter: document.getElementById("statusFilter"),
+      priorityFilter: document.getElementById("priorityFilter"),
+      categoryFilter: document.getElementById("categoryFilter"),
+      sortOrder: document.getElementById("sortOrder"),
+      reportSearch: document.getElementById("reportSearch"),
+      fromDate: document.getElementById("fromDate"),
+      toDate: document.getElementById("toDate"),
+      officeReport: document.getElementById("officeReport"),
+      categoryReport: document.getElementById("categoryReport"),
+      statusReport: document.getElementById("statusReport"),
+      reportScope: document.getElementById("reportScope"),
+      categoryBars: document.getElementById("categoryBars"),
+      statusBars: document.getElementById("statusBars"),
+      officeSummary: document.getElementById("officeSummary"),
+      openMetric: document.getElementById("openMetric"),
+      openNote: document.getElementById("openNote"),
+      dueMetric: document.getElementById("dueMetric"),
+      resolvedMetric: document.getElementById("resolvedMetric"),
+      resolvedNote: document.getElementById("resolvedNote"),
+      avgMetric: document.getElementById("avgMetric"),
+      timeMetric: document.getElementById("timeMetric"),
+      toast: document.getElementById("toast"),
+      exportCsvBtn: document.getElementById("exportCsvBtn"),
+      backupBtn: document.getElementById("backupBtn"),
+      importBtn: document.getElementById("importBtn"),
+      importFile: document.getElementById("importFile"),
+      printBtn: document.getElementById("printBtn")
+    };
+
+    categories.forEach((category) => {
+      el.categoryFilter.appendChild(option(category));
+      el.categoryReport.appendChild(option(category));
+    });
+
+    el.ticketForm.addEventListener("submit", handleSubmit);
+    el.newBtn.addEventListener("click", resetForm);
+    el.deleteBtn.addEventListener("click", deleteCurrentTicket);
+    el.resolveBtn.addEventListener("click", resolveCurrentTicket);
+    el.sampleBtn.addEventListener("click", addSampleData);
+    el.exportCsvBtn.addEventListener("click", exportCsv);
+    el.backupBtn.addEventListener("click", backupJson);
+    el.importBtn.addEventListener("click", () => el.importFile.click());
+    el.importFile.addEventListener("change", importJson);
+    el.printBtn.addEventListener("click", () => window.print());
+
+    [
+      el.searchFilter,
+      el.statusFilter,
+      el.priorityFilter,
+      el.categoryFilter,
+      el.sortOrder,
+      el.reportSearch,
+      el.fromDate,
+      el.toDate,
+      el.officeReport,
+      el.categoryReport,
+      el.statusReport
+    ].forEach((control) => control.addEventListener("input", render));
+
+    resetForm();
+    render();
+
+    function loadTickets() {
+      try {
+        const stored = localStorage.getItem(storageKey);
+        return stored ? JSON.parse(stored) : [];
+      } catch (error) {
+        console.warn("Could not load tickets", error);
+        return [];
+      }
+    }
+
+    function saveTickets() {
+      localStorage.setItem(storageKey, JSON.stringify(tickets));
+    }
+
+    function handleSubmit(event) {
+      event.preventDefault();
+      const now = new Date().toISOString();
+      const id = el.ticketId.value || makeTicketId();
+      const existing = tickets.find((ticket) => ticket.id === id);
+      const ticket = {
+        id,
+        createdAt: el.createdAt.value,
+        status: el.status.value,
+        agentName: clean(el.agentName.value),
+        office: clean(el.office.value),
+        contact: clean(el.contact.value),
+        channel: el.channel.value,
+        category: el.category.value,
+        priority: el.priority.value,
+        summary: clean(el.summary.value),
+        notes: clean(el.notes.value),
+        transaction: clean(el.transaction.value),
+        followUp: el.followUp.value,
+        timeSpent: Number(el.timeSpent.value || 0),
+        resolution: clean(el.resolution.value),
+        resolvedAt: existing ? existing.resolvedAt : "",
+        updatedAt: now
+      };
+
+      if (closedStatuses.includes(ticket.status) && !ticket.resolvedAt) {
+        ticket.resolvedAt = now;
+      }
+
+      if (!closedStatuses.includes(ticket.status)) {
+        ticket.resolvedAt = "";
+      }
+
+      const index = tickets.findIndex((item) => item.id === id);
+      if (index >= 0) {
+        tickets[index] = ticket;
+      } else {
+        tickets.unshift(ticket);
+      }
+
+      saveTickets();
+      render();
+      loadIntoForm(ticket);
+      showToast(index >= 0 ? "Ticket updated." : "Ticket created.");
+    }
+
+    function resetForm() {
+      el.ticketForm.reset();
+      el.ticketId.value = "";
+      el.createdAt.value = toDatetimeLocal(new Date());
+      el.status.value = "New";
+      el.priority.value = "Normal";
+      el.category.value = "MLS / Listing";
+      el.channel.value = "Email";
+      el.formTitle.textContent = "New Ticket";
+      el.formSubtitle.textContent = "Capture the support request while details are fresh.";
+      el.saveBtn.textContent = "Save Ticket";
+      el.deleteBtn.disabled = true;
+      el.resolveBtn.disabled = true;
+      el.agentName.focus();
+    }
+
+    function loadIntoForm(ticket) {
+      el.ticketId.value = ticket.id;
+      el.createdAt.value = ticket.createdAt;
+      el.status.value = ticket.status;
+      el.agentName.value = ticket.agentName;
+      el.office.value = ticket.office;
+      el.contact.value = ticket.contact;
+      el.channel.value = ticket.channel;
+      el.category.value = ticket.category;
+      el.priority.value = ticket.priority;
+      el.summary.value = ticket.summary;
+      el.notes.value = ticket.notes;
+      el.transaction.value = ticket.transaction;
+      el.followUp.value = ticket.followUp;
+      el.timeSpent.value = ticket.timeSpent || "";
+      el.resolution.value = ticket.resolution;
+      el.formTitle.textContent = "Edit " + ticket.id;
+      el.formSubtitle.textContent = ticket.agentName ? ticket.agentName + " - " + ticket.summary : ticket.summary;
+      el.saveBtn.textContent = "Update Ticket";
+      el.deleteBtn.disabled = false;
+      el.resolveBtn.disabled = closedStatuses.includes(ticket.status);
+      document.getElementById("ticketFormPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function deleteCurrentTicket() {
+      if (!el.ticketId.value) return;
+      const ticket = tickets.find((item) => item.id === el.ticketId.value);
+      if (!ticket) return;
+      const confirmed = confirm("Delete " + ticket.id + "? This removes the ticket from this browser.");
+      if (!confirmed) return;
+      tickets = tickets.filter((item) => item.id !== ticket.id);
+      saveTickets();
+      resetForm();
+      render();
+      showToast("Ticket deleted.");
+    }
+
+    function resolveCurrentTicket() {
+      if (!el.ticketId.value) {
+        el.status.value = "Resolved";
+        el.resolution.focus();
+        return;
+      }
+
+      const ticket = tickets.find((item) => item.id === el.ticketId.value);
+      if (!ticket) return;
+      ticket.status = "Resolved";
+      ticket.resolvedAt = new Date().toISOString();
+      ticket.updatedAt = ticket.resolvedAt;
+      if (!ticket.resolution) ticket.resolution = "Resolved.";
+      saveTickets();
+      loadIntoForm(ticket);
+      render();
+      showToast(ticket.id + " marked resolved.");
+    }
+
+    function render() {
+      syncReportOptions();
+      renderTickets();
+      renderMetrics();
+      renderReports();
+      el.sampleBtn.style.display = tickets.length ? "none" : "inline-flex";
+    }
+
+    function renderTickets() {
+      const visible = getVisibleTickets();
+      el.ticketCount.textContent = visible.length + " of " + tickets.length + " tickets shown";
+
+      if (!tickets.length) {
+        el.ticketList.innerHTML = emptyState("No tickets yet", "Add your first agent support request on the left.");
+        return;
+      }
+
+      if (!visible.length) {
+        el.ticketList.innerHTML = emptyState("No matching tickets", "Adjust filters or search to widen the view.");
+        return;
+      }
+
+      el.ticketList.innerHTML = visible.map((ticket) => {
+        const due = dueLabel(ticket);
+        return `
+          <article class="ticket-row">
+            <div class="ticket-main">
+              <div class="ticket-id">${escapeHtml(ticket.id)} - ${formatDate(ticket.createdAt)}</div>
+              <div class="ticket-title">${escapeHtml(ticket.summary)}</div>
+            </div>
+            <div class="ticket-meta">
+              <strong>${escapeHtml(ticket.agentName || "No agent")}</strong><br>
+              ${escapeHtml(ticket.office || "No office")} ${ticket.transaction ? "- " + escapeHtml(ticket.transaction) : ""}
+            </div>
+            <div class="ticket-meta">
+              ${escapeHtml(ticket.category)}<br>
+              ${escapeHtml(ticket.channel || "No channel")}
+            </div>
+            <span class="pill ${statusClass(ticket.status)}">${escapeHtml(ticket.status)}</span>
+            <div>
+              <span class="pill ${priorityClass(ticket.priority)}">${escapeHtml(ticket.priority)}</span>
+              ${due ? `<div class="ticket-meta ${due.className}" style="margin-top: 5px;">${due.text}</div>` : ""}
+            </div>
+            <div class="row-actions">
+              <button class="btn small" type="button" data-edit="${escapeHtml(ticket.id)}">Edit</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      el.ticketList.querySelectorAll("[data-edit]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const ticket = tickets.find((item) => item.id === button.dataset.edit);
+          if (ticket) loadIntoForm(ticket);
+        });
+      });
+    }
+
+    function renderMetrics() {
+      const reportTickets = getReportTickets();
+      const openTickets = tickets.filter((ticket) => openStatuses.includes(ticket.status));
+      const dueToday = tickets.filter((ticket) => {
+        if (!ticket.followUp || !openStatuses.includes(ticket.status)) return false;
+        return startOfDate(ticket.followUp) <= startOfDate(new Date());
+      });
+      const now = new Date();
+      const monthResolved = tickets.filter((ticket) => {
+        if (!ticket.resolvedAt) return false;
+        const resolvedDate = new Date(ticket.resolvedAt);
+        return resolvedDate.getMonth() === now.getMonth() && resolvedDate.getFullYear() === now.getFullYear();
+      });
+      const avgHours = averageResolutionHours(reportTickets);
+      const totalMinutes = reportTickets.reduce((sum, ticket) => sum + Number(ticket.timeSpent || 0), 0);
+
+      el.openMetric.textContent = openTickets.length;
+      el.openNote.textContent = openTickets.length ? "Needs attention or follow-up" : "Ready for the next request";
+      el.dueMetric.textContent = dueToday.length;
+      el.resolvedMetric.textContent = monthResolved.length;
+      el.resolvedNote.textContent = monthName(now) + " resolutions";
+      el.avgMetric.textContent = avgHours ? formatHours(avgHours) : "0h";
+      el.timeMetric.textContent = formatMinutes(totalMinutes);
+    }
+
+    function renderReports() {
+      const reportTickets = getReportTickets();
+      el.reportScope.textContent = reportTickets.length + " ticket" + (reportTickets.length === 1 ? "" : "s") + " in report";
+      renderBars(el.categoryBars, groupCount(reportTickets, "category"));
+      renderBars(el.statusBars, groupCount(reportTickets, "status"));
+      renderOfficeSummary(reportTickets);
+    }
+
+    function renderBars(container, grouped) {
+      const entries = Object.entries(grouped).sort((a, b) => b[1] - a[1]);
+      if (!entries.length) {
+        container.innerHTML = emptyState("No report data", "Tickets matching the report filters will appear here.");
+        return;
+      }
+
+      const max = Math.max(...entries.map((entry) => entry[1]));
+      container.innerHTML = entries.map(([label, count]) => `
+        <div class="bar-row">
+          <div class="bar-label">
+            <span>${escapeHtml(label || "Not specified")}</span>
+            <span>${count}</span>
+          </div>
+          <div class="bar-track" aria-hidden="true">
+            <div class="bar-fill" style="width: ${Math.max(5, Math.round((count / max) * 100))}%"></div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderOfficeSummary(reportTickets) {
+      const summary = reportTickets.reduce((map, ticket) => {
+        const office = ticket.office || "Not specified";
+        if (!map[office]) map[office] = { count: 0, minutes: 0 };
+        map[office].count += 1;
+        map[office].minutes += Number(ticket.timeSpent || 0);
+        return map;
+      }, {});
+
+      const entries = Object.entries(summary).sort((a, b) => b[1].count - a[1].count);
+      if (!entries.length) {
+        el.officeSummary.innerHTML = `<tr><td colspan="3">No report data</td></tr>`;
+        return;
+      }
+
+      el.officeSummary.innerHTML = entries.map(([office, item]) => `
+        <tr>
+          <td>${escapeHtml(office)}</td>
+          <td>${item.count}</td>
+          <td>${item.minutes}</td>
+        </tr>
+      `).join("");
+    }
+
+    function getVisibleTickets() {
+      const search = el.searchFilter.value.trim().toLowerCase();
+      const status = el.statusFilter.value;
+      const priority = el.priorityFilter.value;
+      const category = el.categoryFilter.value;
+
+      return tickets
+        .filter((ticket) => {
+          const searchable = [
+            ticket.id,
+            ticket.agentName,
+            ticket.office,
+            ticket.contact,
+            ticket.channel,
+            ticket.category,
+            ticket.priority,
+            ticket.status,
+            ticket.summary,
+            ticket.notes,
+            ticket.transaction,
+            ticket.resolution
+          ].join(" ").toLowerCase();
+          return (!search || searchable.includes(search))
+            && (status === "All" || ticket.status === status)
+            && (priority === "All" || ticket.priority === priority)
+            && (category === "All" || ticket.category === category);
+        })
+        .sort(sortTickets);
+    }
+
+    function getReportTickets() {
+      const search = el.reportSearch.value.trim().toLowerCase();
+      const from = el.fromDate.value ? startOfDate(el.fromDate.value) : null;
+      const to = el.toDate.value ? endOfDate(el.toDate.value) : null;
+      const office = el.officeReport.value;
+      const category = el.categoryReport.value;
+      const status = el.statusReport.value;
+
+      return tickets.filter((ticket) => {
+        const created = new Date(ticket.createdAt);
+        const searchable = [
+          ticket.id,
+          ticket.agentName,
+          ticket.office,
+          ticket.category,
+          ticket.status,
+          ticket.summary,
+          ticket.notes,
+          ticket.resolution
+        ].join(" ").toLowerCase();
+        return (!search || searchable.includes(search))
+          && (!from || created >= from)
+          && (!to || created <= to)
+          && (office === "All" || ticket.office === office)
+          && (category === "All" || ticket.category === category)
+          && (status === "All" || ticket.status === status);
+      });
+    }
+
+    function sortTickets(a, b) {
+      if (el.sortOrder.value === "oldest") return new Date(a.createdAt) - new Date(b.createdAt);
+      if (el.sortOrder.value === "priority") {
+        return (priorityWeight[a.priority] || 9) - (priorityWeight[b.priority] || 9)
+          || new Date(b.createdAt) - new Date(a.createdAt);
+      }
+      if (el.sortOrder.value === "followup") {
+        const aDate = a.followUp ? new Date(a.followUp) : new Date("2999-12-31");
+        const bDate = b.followUp ? new Date(b.followUp) : new Date("2999-12-31");
+        return aDate - bDate;
+      }
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    }
+
+    function syncReportOptions() {
+      syncSelect(el.officeReport, uniqueValues(tickets.map((ticket) => ticket.office).filter(Boolean)));
+      syncSelect(el.categoryReport, categories);
+      syncSelect(el.categoryFilter, categories);
+    }
+
+    function syncSelect(select, values) {
+      const selected = select.value || "All";
+      select.innerHTML = "";
+      select.appendChild(option("All", "All"));
+      values.forEach((value) => select.appendChild(option(value, value)));
+      select.value = values.includes(selected) ? selected : "All";
+    }
+
+    function groupCount(items, key) {
+      return items.reduce((map, item) => {
+        const value = item[key] || "Not specified";
+        map[value] = (map[value] || 0) + 1;
+        return map;
+      }, {});
+    }
+
+    function uniqueValues(values) {
+      return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+    }
+
+    function makeTicketId() {
+      const year = new Date().getFullYear();
+      const existingNumbers = tickets
+        .map((ticket) => ticket.id.match(/^T-(\d{4})-(\d+)$/))
+        .filter(Boolean)
+        .filter((match) => Number(match[1]) === year)
+        .map((match) => Number(match[2]));
+      const next = existingNumbers.length ? Math.max(...existingNumbers) + 1 : 1;
+      return "T-" + year + "-" + String(next).padStart(4, "0");
+    }
+
+    function dueLabel(ticket) {
+      if (!ticket.followUp || !openStatuses.includes(ticket.status)) return null;
+      const today = startOfDate(new Date());
+      const due = startOfDate(ticket.followUp);
+      if (due < today) return { text: "Overdue", className: "due-overdue" };
+      if (due.getTime() === today.getTime()) return { text: "Due today", className: "due-soon" };
+      return { text: "Due " + formatShortDate(ticket.followUp), className: "" };
+    }
+
+    function averageResolutionHours(items) {
+      const resolved = items.filter((ticket) => ticket.resolvedAt && ticket.createdAt);
+      if (!resolved.length) return 0;
+      const total = resolved.reduce((sum, ticket) => {
+        return sum + Math.max(0, new Date(ticket.resolvedAt) - new Date(ticket.createdAt));
+      }, 0);
+      return total / resolved.length / 1000 / 60 / 60;
+    }
+
+    function exportCsv() {
+      const rows = getReportTickets();
+      if (!rows.length) {
+        showToast("No report tickets to export.");
+        return;
+      }
+
+      const headers = [
+        "Ticket ID",
+        "Created",
+        "Agent",
+        "Office",
+        "Contact",
+        "Channel",
+        "Category",
+        "Priority",
+        "Status",
+        "Summary",
+        "Property / Transaction",
+        "Follow-up",
+        "Time Spent Minutes",
+        "Resolved At",
+        "Notes",
+        "Resolution"
+      ];
+
+      const body = rows.map((ticket) => [
+        ticket.id,
+        ticket.createdAt,
+        ticket.agentName,
+        ticket.office,
+        ticket.contact,
+        ticket.channel,
+        ticket.category,
+        ticket.priority,
+        ticket.status,
+        ticket.summary,
+        ticket.transaction,
+        ticket.followUp,
+        ticket.timeSpent,
+        ticket.resolvedAt,
+        ticket.notes,
+        ticket.resolution
+      ]);
+
+      downloadFile("brokerage-helpdesk-report.csv", toCsv([headers, ...body]), "text/csv");
+      showToast("CSV report exported.");
+    }
+
+    function backupJson() {
+      downloadFile(
+        "brokerage-helpdesk-backup.json",
+        JSON.stringify({ exportedAt: new Date().toISOString(), tickets }, null, 2),
+        "application/json"
+      );
+      showToast("Backup downloaded.");
+    }
+
+    function importJson(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          const imported = Array.isArray(parsed) ? parsed : parsed.tickets;
+          if (!Array.isArray(imported)) throw new Error("Missing tickets array");
+          const confirmed = confirm("Import " + imported.length + " tickets? This replaces the tickets in this browser.");
+          if (!confirmed) return;
+          tickets = imported.map(normalizeTicket);
+          saveTickets();
+          resetForm();
+          render();
+          showToast("Tickets imported.");
+        } catch (error) {
+          showToast("Import failed. Choose a valid backup JSON file.");
+        } finally {
+          event.target.value = "";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function addSampleData() {
+      const now = new Date();
+      const oneDay = 24 * 60 * 60 * 1000;
+      tickets = [
+        {
+          id: "T-" + now.getFullYear() + "-0003",
+          createdAt: toDatetimeLocal(new Date(now - oneDay * 1)),
+          status: "Waiting",
+          agentName: "Jordan Blake",
+          office: "North Branch",
+          contact: "jordan@example.com",
+          channel: "Email",
+          category: "E-signature",
+          priority: "High",
+          summary: "Envelope stuck waiting for client signature",
+          notes: "Checked template mapping and resent signing link. Waiting on vendor sync.",
+          transaction: "42 Maple Ave",
+          followUp: toDateInput(now),
+          timeSpent: 35,
+          resolution: "",
+          resolvedAt: "",
+          updatedAt: now.toISOString()
+        },
+        {
+          id: "T-" + now.getFullYear() + "-0002",
+          createdAt: toDatetimeLocal(new Date(now - oneDay * 5)),
+          status: "Resolved",
+          agentName: "Taylor Morgan",
+          office: "Main Office",
+          contact: "555-0142",
+          channel: "Phone",
+          category: "MLS / Listing",
+          priority: "Normal",
+          summary: "Listing photo upload failed",
+          notes: "Image files were above MLS size limit.",
+          transaction: "18 Cedar Court",
+          followUp: "",
+          timeSpent: 25,
+          resolution: "Compressed image set and confirmed upload.",
+          resolvedAt: new Date(now - oneDay * 4).toISOString(),
+          updatedAt: new Date(now - oneDay * 4).toISOString()
+        },
+        {
+          id: "T-" + now.getFullYear() + "-0001",
+          createdAt: toDatetimeLocal(new Date(now - oneDay * 9)),
+          status: "Closed",
+          agentName: "Morgan Lee",
+          office: "Main Office",
+          contact: "morgan@example.com",
+          channel: "Walk-in",
+          category: "Device / Printer",
+          priority: "Low",
+          summary: "Conference room printer not showing",
+          notes: "Printer was removed after a driver update.",
+          transaction: "",
+          followUp: "",
+          timeSpent: 40,
+          resolution: "Reinstalled printer profile and printed test page.",
+          resolvedAt: new Date(now - oneDay * 8).toISOString(),
+          updatedAt: new Date(now - oneDay * 8).toISOString()
+        }
+      ];
+      saveTickets();
+      render();
+      showToast("Sample tickets added.");
+    }
+
+    function normalizeTicket(ticket) {
+      return {
+        id: ticket.id || makeTicketId(),
+        createdAt: ticket.createdAt || toDatetimeLocal(new Date()),
+        status: ticket.status || "New",
+        agentName: ticket.agentName || "",
+        office: ticket.office || "",
+        contact: ticket.contact || "",
+        channel: ticket.channel || "Email",
+        category: ticket.category || "Other",
+        priority: ticket.priority || "Normal",
+        summary: ticket.summary || "Imported ticket",
+        notes: ticket.notes || "",
+        transaction: ticket.transaction || "",
+        followUp: ticket.followUp || "",
+        timeSpent: Number(ticket.timeSpent || 0),
+        resolution: ticket.resolution || "",
+        resolvedAt: ticket.resolvedAt || "",
+        updatedAt: ticket.updatedAt || new Date().toISOString()
+      };
+    }
+
+    function emptyState(title, body) {
+      return `<div class="empty-state"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(body)}</span></div>`;
+    }
+
+    function option(text, value) {
+      const item = document.createElement("option");
+      item.textContent = text;
+      item.value = value || text;
+      return item;
+    }
+
+    function clean(value) {
+      return value.trim();
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function statusClass(status) {
+      return "status-" + String(status || "").toLowerCase().replaceAll(" ", "-");
+    }
+
+    function priorityClass(priority) {
+      return "priority-" + String(priority || "").toLowerCase();
+    }
+
+    function formatDate(value) {
+      if (!value) return "No date";
+      return new Intl.DateTimeFormat(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      }).format(new Date(value));
+    }
+
+    function formatShortDate(value) {
+      return new Intl.DateTimeFormat(undefined, {
+        month: "short",
+        day: "numeric"
+      }).format(startOfDate(value));
+    }
+
+    function monthName(date) {
+      return new Intl.DateTimeFormat(undefined, { month: "long" }).format(date);
+    }
+
+    function formatMinutes(minutes) {
+      if (!minutes) return "0h";
+      const hours = minutes / 60;
+      return hours < 10 ? hours.toFixed(1) + "h" : Math.round(hours) + "h";
+    }
+
+    function formatHours(hours) {
+      if (hours < 1) return Math.round(hours * 60) + "m";
+      return hours < 10 ? hours.toFixed(1) + "h" : Math.round(hours) + "h";
+    }
+
+    function toDatetimeLocal(date) {
+      const d = new Date(date);
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      return d.toISOString().slice(0, 16);
+    }
+
+    function toDateInput(date) {
+      const d = new Date(date);
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      return d.toISOString().slice(0, 10);
+    }
+
+    function startOfDate(value) {
+      const date = value instanceof Date ? new Date(value) : new Date(value + "T00:00:00");
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+
+    function endOfDate(value) {
+      const date = startOfDate(value);
+      date.setHours(23, 59, 59, 999);
+      return date;
+    }
+
+    function toCsv(rows) {
+      return rows.map((row) => row.map((value) => {
+        const text = String(value ?? "");
+        return '"' + text.replaceAll('"', '""') + '"';
+      }).join(",")).join("\n");
+    }
+
+    function downloadFile(filename, content, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function showToast(message) {
+      el.toast.textContent = message;
+      el.toast.classList.add("show");
+      clearTimeout(showToast.timeout);
+      showToast.timeout = setTimeout(() => el.toast.classList.remove("show"), 2400);
+    }
+  </script>
+</body>
+</html>
